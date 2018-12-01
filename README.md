@@ -1,6 +1,6 @@
 # Lurker
 
-Web crawl esports, primarily *Rocket League*, tournament sites for entrants and results. 
+Web crawls esports, primarily *Rocket League*, tournament sites for entrants and results. 
 
 **Supported Sites**
 
