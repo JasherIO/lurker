@@ -104,6 +104,6 @@ venv.bak/
 .mypy_cache/
 
 # scrapy
-.csv
-.jl
-.json
+*.csv
+*.jl
+*.json
