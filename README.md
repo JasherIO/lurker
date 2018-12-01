@@ -2,6 +2,11 @@
 
 Web crawl esports, primarily *Rocket League*, tournament sites for entrants and results. 
 
+**Supported Sites**
+
+* [Beyond Esports](http://teambeyond.net)
+* [Rocket League Tracker Network](https://rocketleague.tracker.network)
+
 ## Installation
 
 ```bash
