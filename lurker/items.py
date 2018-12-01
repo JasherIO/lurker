@@ -17,14 +17,11 @@ class Team(scrapy.Item):
     name = scrapy.Field()
 
 class Player(scrapy.Item):
-    team = scrapy.Field()
     name = scrapy.Field()
     displayName = scrapy.Field()
     platform = scrapy.Field()
     platformId = scrapy.Field()
-    duel = scrapy.Field()
-    doubles = scrapy.Field()
-    standard = scrapy.Field()
+    team = scrapy.Field()
 
 class Rank(scrapy.Item):
     player = scrapy.Field()

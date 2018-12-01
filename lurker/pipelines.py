@@ -5,12 +5,21 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
+from items import Player, Rank
 import validators
-from items import Player
+
+import logging
+
+def strip(item):
+    for key in item.keys():
+        if isinstance(item[key], str):
+            item[key] = item[key].strip()
 
 class PlayerPipeline(object):
     def process_item(self, item, spider):
         if isinstance(item, Player):
+            strip(item)
+            
             p = item['platform'].split('/').pop()
 
             if p == "Steam20.png":
@@ -21,5 +30,22 @@ class PlayerPipeline(object):
             
             if validators.url(item['platformId']):
                 item['platformId'] = item['platformId'].strip('/').split('/').pop()
+
+        return item
+
+
+class RankPipeline(object):
+    def process_item(self, item, spider):
+        if isinstance(item, Rank):
+            strip(item)
+            
+            duelStr = item['duel'].strip().replace(',', '')
+            item['duel'] = int(duelStr) if duelStr else ''
+
+            doublesStr = item['doubles'].strip().replace(',', '')
+            item['doubles'] = int(doublesStr) if doublesStr else ''
+
+            standardStr = item['standard'].strip().replace(',', '')
+            item['standard'] = int(standardStr) if standardStr else ''
 
         return item

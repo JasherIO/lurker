@@ -10,7 +10,7 @@ pip install validators
 ## Usage
 
 ```bash
-scrapy crawl beyond -o teams.csv -a url="http://teambeyond.net/forum/tournaments/standings/160-astronauts-2000-rocket-league-3v3-1126-700pm-est/"
+scrapy crawl beyond -o teams.csv -a tournament="http://teambeyond.net/forum/tournaments/standings/160-astronauts-2000-rocket-league-3v3-1126-700pm-est/"
 ```
 
 ## Resources
