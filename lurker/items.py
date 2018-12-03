@@ -7,20 +7,27 @@
 
 import scrapy
 
+class Match(scrapy.Item):
+    rnd = scrapy.Field()
+    teamA = scrapy.Field()
+    scoreA = scrapy.Field()
+    teamB = scrapy.Field()
+    scoreB = scrapy.Field()
 
-class LurkerItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
-
-class Team(scrapy.Item):
-    name = scrapy.Field()
+class Placement(scrapy.Item):
+    position = scrapy.Field()
+    team = scrapy.Field()
+    matchWins = scrapy.Field()
+    matchLosses = scrapy.Field()
+    gameWins = scrapy.Field()
+    gameLosses = scrapy.Field()
 
 class Player(scrapy.Item):
     name = scrapy.Field()
     displayName = scrapy.Field()
     platform = scrapy.Field()
     platformId = scrapy.Field()
+    role = scrapy.Field()
     team = scrapy.Field()
 
 class Rank(scrapy.Item):
@@ -28,3 +35,7 @@ class Rank(scrapy.Item):
     duel = scrapy.Field()
     doubles = scrapy.Field()
     standard = scrapy.Field()
+
+class Team(scrapy.Item):
+    name = scrapy.Field()
+    full = scrapy.Field()
