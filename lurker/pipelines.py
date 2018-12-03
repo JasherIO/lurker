@@ -16,20 +16,26 @@ def strip(item):
             item[key] = item[key].strip()
 
 class PlayerPipeline(object):
+    def clean(self, item):
+        if not 'platform' in item or not 'platformId' in item:
+            return item
+        
+        p = item['platform'].split('/').pop()
+
+        if p == "Steam20.png":
+            item['platform'] = "steam"
+        
+        if p == "PS20.png":
+            item['platform'] = "ps"
+        
+        if validators.url(item['platformId']):
+            item['platformId'] = item['platformId'].strip('/').split('/').pop()
+
+
     def process_item(self, item, spider):
         if isinstance(item, Player):
             strip(item)
-            
-            p = item['platform'].split('/').pop()
-
-            if p == "Steam20.png":
-                item['platform'] = "steam"
-            
-            if p == "PS20.png":
-                item['platform'] = "ps"
-            
-            if validators.url(item['platformId']):
-                item['platformId'] = item['platformId'].strip('/').split('/').pop()
+            self.clean(item)
 
         return item
 
