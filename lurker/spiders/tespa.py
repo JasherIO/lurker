@@ -48,24 +48,26 @@ class TespaSpider(scrapy.Spider):
 
     def start_requests(self):
         for url in groups:
-            yield scrapy.Request(url, self.parse_round_robin)
+            yield scrapy.Request(url, self.parse)
 
-    def parse_round_robin(self, response):
-        # for row in response.css(STANDINGS_SELECTOR):
-        #     position = row.css(POSITION_SELECTOR).extract_first(default='')
+    def parse(self, response):
+        # Standings
+        for row in response.css(STANDINGS_SELECTOR):
+            position = row.css(POSITION_SELECTOR).extract_first(default='')
             
-        #     team = row.css(TEAM_SELECTOR).extract_first(default='').strip()
-        #     href = row.css(TEAM_LINK_SELECTOR).extract_first(default='')
-        #     yield scrapy.Request(href, self.parse_team)
+            team = row.css(TEAM_SELECTOR).extract_first(default='').strip()
+            href = row.css(TEAM_LINK_SELECTOR).extract_first(default='')
+            yield scrapy.Request(href, self.parse_team)
             
-        #     match = row.css(MATCH_SELECTOR).extract_first(default='')
-        #     [matchWins, matchLosses] = match.strip(' ').split('-')
+            match = row.css(MATCH_SELECTOR).extract_first(default='')
+            [matchWins, matchLosses] = match.strip(' ').split('-')
             
-        #     game = row.css(GAME_SELECTOR).extract_first(default='')
-        #     [gameWins, gameLosses] = game.strip(' ').split('-')
+            game = row.css(GAME_SELECTOR).extract_first(default='')
+            [gameWins, gameLosses] = game.strip(' ').split('-')
 
-        #     yield Placement(position=position, team=team, matchWins=matchWins, matchLosses=matchLosses, gameWins=gameWins, gameLosses=gameLosses)
-
+            yield Placement(position=position, team=team, matchWins=matchWins, matchLosses=matchLosses, gameWins=gameWins, gameLosses=gameLosses)
+        
+        # Rounds
         for row in response.css(ROUNDS_SELECTOR):
             index = row.css(ROUND_TITLE_SELECTOR).extract_first(default='').strip().split(' ').pop()
             
@@ -78,7 +80,6 @@ class TespaSpider(scrapy.Spider):
                 
                 yield Match(rnd=index, teamA=teamA, scoreA=scoreA, teamB=teamB, scoreB=scoreB)
 
-
     def parse_team(self, response):
         team = response.css(NAME_SELECTOR).extract_first(default='')
         full = response.css(FULL_SELECTOR).extract_first(default='')
@@ -88,4 +89,4 @@ class TespaSpider(scrapy.Spider):
             displayName = row.css(PLAYER_DISPLAY_SELECTOR).extract_first(default='').strip()
 
             yield Player(name=name, displayName=displayName, team=team)
-      
+
