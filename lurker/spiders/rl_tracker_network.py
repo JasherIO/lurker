@@ -8,16 +8,14 @@ import json
 import logging
 
 ERROR_SELECTOR = 'body > div.container.content-container > div:nth-child(1) > div.alert.alert-danger.alert-dismissable'
-DUEL_SELECTOR = '#season-9 > table:nth-child(2) > tbody > tr:nth-child(1) > td:nth-child(4)::text'
-DOUBLES_SELECTOR = '#season-9 > table:nth-child(2) > tbody > tr:nth-child(2) > td:nth-child(4)::text'
-STANDARD_SELECTOR = '#season-9 > table:nth-child(2) > tbody > tr:nth-child(3) > td:nth-child(4)::text'
+RANKS_SELECTOR = '#season-9 > table:nth-child(2) > tbody > tr'
+RANK_NAME_SELECTOR = 'td:nth-child(2)::text'
+RANK_MMR_SELECTOR = 'td:nth-child(4)::text'
 
 def toUrl(player):
     return "https://rocketleague.tracker.network/profile/" + player['platform'] + "/" + player['platformId']
 
-# scrapy crawl rl-tracker-network -a entrantsFile="entrants.csv" -o ranks.jl
-# scrapy crawl rl-tracker-network -a entrantsFile="entrants.json" -o ranks.jl
-# scrapy crawl rl-tracker-network -a entrantsFile="entrants.jl" -o ranks.jl
+# scrapy crawl rl-tracker-network -a entrantsFile="entrants.csv" -o ranks.csv
 class RlTrackerNetworkSpider(scrapy.Spider):
     name = 'rl-tracker-network'
     allowed_domains = ['rocketleague.tracker.network']
@@ -51,12 +49,19 @@ class RlTrackerNetworkSpider(scrapy.Spider):
         return
         
     def parse(self, response):
-        item = Rank(player=response.meta['player'])
+        item = Rank(player=response.meta['player']['displayName'], team=response.meta['player']['team'])
 
         error = response.css(ERROR_SELECTOR).extract_first()
         if not error:
-            item['duel'] = response.css(DUEL_SELECTOR).extract_first(default='')
-            item['doubles'] = response.css(DOUBLES_SELECTOR).extract_first(default='')
-            item['standard'] = response.css(STANDARD_SELECTOR).extract_first(default='')
+            for rank in response.css(RANKS_SELECTOR):
+                name = rank.css(RANK_NAME_SELECTOR).extract_first(default='').strip()
+                mmr = rank.css(RANK_MMR_SELECTOR).extract_first(default='').strip()
+                
+                if name == 'Ranked Duel 1v1':
+                    item['duel'] = mmr
+                elif name == 'Ranked Doubles 2v2':
+                    item['doubles'] = mmr
+                elif name == 'Ranked Standard 3v3':
+                    item['standard'] = mmr
 
         yield item
