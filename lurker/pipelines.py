@@ -5,10 +5,8 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-from items import Player, Rank
+from items import Match, Player, Rank
 import validators
-
-import logging
 
 def strip(item):
     for key in item.keys():
@@ -31,7 +29,6 @@ class PlayerPipeline(object):
         if validators.url(item['platformId']):
             item['platformId'] = item['platformId'].strip('/').split('/').pop()
 
-
     def process_item(self, item, spider):
         if isinstance(item, Player):
             strip(item)
@@ -39,19 +36,21 @@ class PlayerPipeline(object):
 
         return item
 
-
 class RankPipeline(object):
     def process_item(self, item, spider):
         if isinstance(item, Rank):
             strip(item)
             
-            duelStr = item['duel'].strip().replace(',', '')
-            item['duel'] = int(duelStr) if duelStr else ''
+            if 'duel' in item:
+                duelStr = item['duel'].strip().replace(',', '')
+                item['duel'] = int(duelStr) if duelStr else ''
 
-            doublesStr = item['doubles'].strip().replace(',', '')
-            item['doubles'] = int(doublesStr) if doublesStr else ''
+            if 'doubles' in item:
+                doublesStr = item['doubles'].strip().replace(',', '')
+                item['doubles'] = int(doublesStr) if doublesStr else ''
 
-            standardStr = item['standard'].strip().replace(',', '')
-            item['standard'] = int(standardStr) if standardStr else ''
+            if 'standard' in item:
+                standardStr = item['standard'].strip().replace(',', '')
+                item['standard'] = int(standardStr) if standardStr else ''
 
         return item

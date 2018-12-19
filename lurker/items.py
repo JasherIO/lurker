@@ -13,6 +13,7 @@ class Match(scrapy.Item):
     scoreA = scrapy.Field()
     teamB = scrapy.Field()
     scoreB = scrapy.Field()
+    event = scrapy.Field()
 
 class Placement(scrapy.Item):
     position = scrapy.Field()
@@ -21,6 +22,7 @@ class Placement(scrapy.Item):
     matchLosses = scrapy.Field()
     gameWins = scrapy.Field()
     gameLosses = scrapy.Field()
+    event = scrapy.Field()
 
 class Player(scrapy.Item):
     name = scrapy.Field()
@@ -32,6 +34,7 @@ class Player(scrapy.Item):
 
 class Rank(scrapy.Item):
     player = scrapy.Field()
+    team = scrapy.Field()
     duel = scrapy.Field()
     doubles = scrapy.Field()
     standard = scrapy.Field()
