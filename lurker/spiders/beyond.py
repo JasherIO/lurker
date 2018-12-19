@@ -2,8 +2,7 @@
 import scrapy
 from ..items import Player
 
-# scrapy crawl beyond -a tournament="http://teambeyond.net/forum/tournaments/standings/160-astronauts-2000-rocket-league-3v3-1126-700pm-est/" -o entrants.csv
-# scrapy crawl beyond -a tournament="http://teambeyond.net/forum/tournaments/standings/162-astronauts-1000-rocket-league-1v1-125-700pm-est/" -o entrants.csv
+# scrapy crawl beyond -a tournament="http://teambeyond.net/forum/tournaments/standings/164-astronauts-2000-rocket-league-3v3-1217-700pm-est/" -o entrants.csv
 class BeyondSpider(scrapy.Spider):
     name = 'beyond'
     allowed_domains = ['teambeyond.net']
