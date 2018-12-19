@@ -2,20 +2,12 @@
 import scrapy
 from ..items import Match, Placement, Player, Team
 
-import logging
-
-# scrapy crawl tespa
-
 groups = [
-    'https://compete.tespa.org/tournament/78/phase/3/group/1'
+    'https://compete.tespa.org/tournament/78/phase/3/group/1',
+    'https://compete.tespa.org/tournament/79/phase/3/group/1',
+    'https://compete.tespa.org/tournament/80/phase/3/group/1',
+    'https://compete.tespa.org/tournament/81/phase/3/group/1',
 ]
-
-# groups = [
-#     'https://compete.tespa.org/tournament/78/phase/3/group/1',
-#     'https://compete.tespa.org/tournament/79/phase/3/group/1',
-#     'https://compete.tespa.org/tournament/80/phase/3/group/1',
-#     'https://compete.tespa.org/tournament/81/phase/3/group/1',
-# ]
 
 # Standings
 STANDINGS_SELECTOR = '#collapseGroup > table > tbody > tr'
