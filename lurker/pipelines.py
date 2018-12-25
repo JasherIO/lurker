@@ -5,8 +5,9 @@
 # Don't forget to add your pipeline to the ITEM_PIPELINES setting
 # See: https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 
-from items import Match, Player, Rank
+from scrapy.exporters import CsvItemExporter
 import validators
+from items import Match, Player, Rank
 
 def strip(item):
     for key in item.keys():
@@ -14,25 +15,19 @@ def strip(item):
             item[key] = item[key].strip()
 
 class PlayerPipeline(object):
-    def clean(self, item):
-        if not 'platform' in item or not 'platformId' in item:
-            return item
-        
-        p = item['platform'].split('/').pop()
+    def open_spider(self, spider):
+        fields_to_export = ['name', 'displayName', 'team', 'platform', 'platformId', 'role']
+        f = open('players.csv', 'wb')
+        self.exporter = CsvItemExporter(f, fields_to_export=fields_to_export)
+        self.exporter.start_exporting()
 
-        if p == "Steam20.png":
-            item['platform'] = "steam"
-        
-        if p == "PS20.png":
-            item['platform'] = "ps"
-        
-        if validators.url(item['platformId']):
-            item['platformId'] = item['platformId'].strip('/').split('/').pop()
+    def close_spider(self, spider):
+        self.exporter.finish_exporting()
+        # self.exporter.file.close()
 
     def process_item(self, item, spider):
         if isinstance(item, Player):
-            strip(item)
-            self.clean(item)
+            self.exporter.export_item(item)
 
         return item
 
