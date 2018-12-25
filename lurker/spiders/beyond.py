@@ -1,8 +1,20 @@
 # -*- coding: utf-8 -*-
 import scrapy
+import validators
 from ..items import Player
 
-# scrapy crawl beyond -a tournament="http://teambeyond.net/forum/tournaments/standings/164-astronauts-2000-rocket-league-3v3-1217-700pm-est/" -o entrants.csv
+TEAMS_SELECTOR = '#ipsTabs_elTourneyTabs_standings_panel > div > div > table > tbody > tr > td > a::attr(href)'
+TEAM_NAME_SELECTOR = '#ipsLayout_mainArea > section > div:nth-child(1) > div.title-section > h3::text'
+PLAYERS_SELECTOR = '#ipsTabs_elTeamTabs_details_panel > div > div > table > tbody > tr'
+PLAYER_DISPLAY_NAME_SELECTOR = 'td:nth-child(1) > a::text'
+PLAYER_PLATFORM_SELECTOR = 'td:nth-child(3) > div > span > img::attr(src)'
+PLAYER_STEAM_ID_SELECTOR = 'td:nth-child(3) > div > ul > li > ul > li > a::text'
+PLAYER_PS_ID_SELECTOR = 'td:nth-child(3)::text'
+
+STEAM_PICTURE = 'https://teambeyond.net/forum/uploads/set_resources_2/a6a2e7cb1d0d4e506cc9e64a9611c0f2_Steam20.png'
+PS_PICTURE = 'https://teambeyond.net/forum/uploads/set_resources_2/a6a2e7cb1d0d4e506cc9e64a9611c0f2_PS20.png'
+
+# scrapy crawl beyond -a tournament="https://teambeyond.net/forum/tournaments/164-astronauts-2000-rocket-league-3v3-1217-700pm-est/standings/" -o entrants.csv
 class BeyondSpider(scrapy.Spider):
     name = 'beyond'
     allowed_domains = ['teambeyond.net']
@@ -17,18 +29,23 @@ class BeyondSpider(scrapy.Spider):
         return
 
     def parse(self, response):
-        for href in response.css('.next a::attr(href)'):
-            yield response.follow(href, self.parse)
-
-        for href in response.css('.row2 td a::attr(href)'):
+        for href in response.css(TEAMS_SELECTOR):
             yield response.follow(href, self.parse_team)
 
     def parse_team(self, response):
-        team = response.css('.team-1 h3::text').extract_first(default='')
+        team = response.css(TEAM_NAME_SELECTOR).extract_first(default='')
 
-        for player in response.css('.row2'):
-            displayName = player.xpath('td[1]//text()').extract_first(default='')
-            platform = player.xpath('td[3]//@src').extract_first(default='')
-            platformId = player.xpath('td[3]//text()').extract_first(default='').strip() or player.xpath('td[3]//div//text()').extract_first(default='').strip()
+        for player in response.css(PLAYERS_SELECTOR):
+            displayName = player.css(PLAYER_DISPLAY_NAME_SELECTOR).extract_first(default='').strip()
+            platform = player.css(PLAYER_PLATFORM_SELECTOR).extract_first(default='')
+            platformId = player.css(PLAYER_STEAM_ID_SELECTOR).extract_first(default='').strip() or player.css(PLAYER_PS_ID_SELECTOR).extract_first(default='').strip()
             
+            if platform == STEAM_PICTURE:
+                platform = "steam"
+            elif platform == PS_PICTURE:
+                platform = "ps"
+            
+            if validators.url(platformId):
+                platformId = platformId.strip('/').split('/').pop()
+
             yield Player(team=team, displayName=displayName, platform=platform, platformId=platformId)
