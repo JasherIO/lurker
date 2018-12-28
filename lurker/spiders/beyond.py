@@ -12,8 +12,6 @@ PLAYER_PS_SELECTOR = 'td:nth-child(3) > span > img::attr(src)'
 PLAYER_STEAM_ID_SELECTOR = 'td:nth-child(3) > div > ul > li > ul > li > a::text'
 PLAYER_PS_ID_SELECTOR = 'td:nth-child(3)::text'
 
-
-
 STEAM_PICTURE = 'https://teambeyond.net/forum/uploads/set_resources_2/a6a2e7cb1d0d4e506cc9e64a9611c0f2_Steam20.png'
 PS_PICTURE = 'https://teambeyond.net/forum/uploads/set_resources_2/a6a2e7cb1d0d4e506cc9e64a9611c0f2_PS20.png'
 
@@ -41,7 +39,7 @@ class BeyondSpider(scrapy.Spider):
         for player in response.css(PLAYERS_SELECTOR):
             displayName = player.css(PLAYER_DISPLAY_NAME_SELECTOR).extract_first(default='').strip()
             platform = player.css(PLAYER_STEAM_SELECTOR).extract_first(default='') or player.css(PLAYER_PS_SELECTOR).extract_first(default='')
-            platformId = player.css(PLAYER_STEAM_ID_SELECTOR).extract_first(default='').strip() or player.css(PLAYER_PS_ID_SELECTOR).extract_first(default='').strip()
+            platformId = player.css(PLAYER_STEAM_ID_SELECTOR).extract_first(default='').strip() or player.css(PLAYER_PS_ID_SELECTOR).extract().pop().strip()
             
             if platform == STEAM_PICTURE:
                 platform = "steam"
@@ -49,7 +47,7 @@ class BeyondSpider(scrapy.Spider):
             if platform == PS_PICTURE:
                 platform = "ps"
             
-            if validators.url(platformId):
+            if validators.url(platformId) or platformId.find('steamcommunity') > -1:
                 platformId = platformId.strip('/').split('/').pop()
 
             yield Player(team=team, displayName=displayName, platform=platform, platformId=platformId)
