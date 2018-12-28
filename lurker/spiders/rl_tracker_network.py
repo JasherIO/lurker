@@ -15,31 +15,33 @@ RANK_MMR_SELECTOR = 'td:nth-child(4)::text'
 def toUrl(player):
     return "https://rocketleague.tracker.network/profile/" + player['platform'] + "/" + player['platformId']
 
-# scrapy crawl rl-tracker-network -a entrantsFile="entrants.csv" -o ranks.csv
+# scrapy crawl rl-tracker-network -a entrantsFile="entrants.csv"
 class RlTrackerNetworkSpider(scrapy.Spider):
     name = 'rl-tracker-network'
     allowed_domains = ['rocketleague.tracker.network']
 
     def start_requests(self):
+
         if not hasattr(self, 'entrantsFile'):
             return
 
         if self.entrantsFile.endswith('.csv'):
-            with open(self.entrantsFile) as csvfile:
+
+            with open(self.entrantsFile, 'r') as csvfile:
                 for obj in csv.DictReader(csvfile):
                     request = scrapy.Request(toUrl(obj), self.parse)
                     request.meta['player'] = obj
                     yield request
             
         if self.entrantsFile.endswith('.json'):
-            with open(self.entrantsFile) as jsonfile:
+            with open(self.entrantsFile, 'r') as jsonfile:
                 for obj in json.load(jsonfile):
                     request = scrapy.Request(toUrl(obj), self.parse)
                     request.meta['player'] = obj
                     yield request
 
         if self.entrantsFile.endswith('.jl'):
-            with open(self.entrantsFile) as jlfile:
+            with open(self.entrantsFile, 'r') as jlfile:
                 for line in jlfile:
                     obj = json.loads(line)
                     request = scrapy.Request(toUrl(obj), self.parse)
