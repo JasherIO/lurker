@@ -66,7 +66,7 @@ ROBOTSTXT_OBEY = True
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'lurker.pipelines.PlayerPipeline': 1,
-   'lurker.pipelines.RankPipeline': 1,
+   'lurker.pipelines.RankPipeline': 2,
 }
 
 # Enable and configure the AutoThrottle extension (disabled by default)

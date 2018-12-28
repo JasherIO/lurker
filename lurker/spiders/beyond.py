@@ -2,6 +2,7 @@
 import scrapy
 import validators
 from ..items import Player
+import logging
 
 TEAMS_SELECTOR = '#ipsTabs_elTourneyTabs_standings_panel > div > div > table > tbody > tr > td > a::attr(href)'
 TEAM_NAME_SELECTOR = '#ipsLayout_mainArea > section > div:nth-child(1) > div.title-section > h3::text'
@@ -50,4 +51,6 @@ class BeyondSpider(scrapy.Spider):
             if validators.url(platformId) or platformId.find('steamcommunity') > -1:
                 platformId = platformId.strip('/').split('/').pop()
 
-            yield Player(team=team, displayName=displayName, platform=platform, platformId=platformId)
+            p = Player(team=team, displayName=displayName, platform=platform, platformId=platformId)
+            logging.info(p)
+            yield p

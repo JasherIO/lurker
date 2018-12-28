@@ -40,10 +40,8 @@ class PlayerPipeline(object):
             return
 
         if not isinstance(item, Player):
-            logging.info('NOT PLAYER')
             return 
             
-        logging.info('EXPORTING')
         self.exporter.export_item(item)
         return item
 
