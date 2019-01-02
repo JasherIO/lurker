@@ -37,10 +37,10 @@ class PlayerPipeline(object):
 
     def process_item(self, item, spider):
         if spider.name == 'rl-tracker-network':
-            return
+            return item
 
         if not isinstance(item, Player):
-            return 
+            return item
             
         self.exporter.export_item(item)
         return item
@@ -94,10 +94,10 @@ class RankPipeline(object):
 
     def process_item(self, item, spider):
         if not spider.name == 'rl-tracker-network':
-            return
+            return item
 
         if not isinstance(item, Rank):
-            return
+            return item
 
 
         strip(item)
