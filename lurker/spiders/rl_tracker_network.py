@@ -15,7 +15,7 @@ RANK_MMR_SELECTOR = 'td:nth-child(4)::text'
 def toUrl(player):
     return "https://rocketleague.tracker.network/profile/" + player['platform'] + "/" + player['platformId']
 
-# scrapy crawl rl-tracker-network -a entrantsFile="entrants.csv"
+# scrapy crawl rl-tracker-network -a entrantsFile="players.csv"
 class RlTrackerNetworkSpider(scrapy.Spider):
     name = 'rl-tracker-network'
     allowed_domains = ['rocketleague.tracker.network']
