@@ -103,7 +103,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
-# scrapy
+# scrapy data
 *.csv
 *.jl
 *.json
+*.wiki
