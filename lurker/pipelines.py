@@ -8,7 +8,7 @@
 from scrapy.exporters import CsvItemExporter
 import validators
 import csv
-from items import Match, Player, Rank
+from items import Match, Placement, Player, Rank
 import logging
 
 def strip(item):
@@ -18,6 +18,58 @@ def strip(item):
 
 def get(obj, key, default=''):
     return obj[key] if key in obj else default
+
+class MatchPipeline(object):
+    def open_spider(self, spider):
+        if spider.name != 'tespa':
+            return
+        
+        fields_to_export = ['rnd', 'teamA', 'scoreA', 'teamB', 'scoreB']
+        f = open('matches.csv', 'wb')
+        self.exporter = CsvItemExporter(f, fields_to_export=fields_to_export)
+        self.exporter.start_exporting()
+
+    def close_spider(self, spider):
+        if spider.name != 'tespa':
+            return
+
+        self.exporter.finish_exporting()
+
+    def process_item(self, item, spider):
+        if spider.name != 'tespa':
+            return item
+
+        if not isinstance(item, Match):
+            return item
+            
+        self.exporter.export_item(item)
+        return item
+
+class PlacementPipeline(object):
+    def open_spider(self, spider):
+        if spider.name != 'tespa':
+            return
+        
+        fields_to_export = ['position', 'team', 'matchWins', 'matchLosses', 'gameWins', 'gameLosses']
+        f = open('placements.csv', 'wb')
+        self.exporter = CsvItemExporter(f, fields_to_export=fields_to_export)
+        self.exporter.start_exporting()
+
+    def close_spider(self, spider):
+        if spider.name != 'tespa':
+            return
+
+        self.exporter.finish_exporting()
+
+    def process_item(self, item, spider):
+        if spider.name != 'tespa':
+            return item
+
+        if not isinstance(item, Placement):
+            return item
+            
+        self.exporter.export_item(item)
+        return item
 
 class PlayerPipeline(object):
     def open_spider(self, spider):
@@ -44,7 +96,6 @@ class PlayerPipeline(object):
             
         self.exporter.export_item(item)
         return item
-
 
 MAX_PLAYERS = 5
 class RankPipeline(object):
