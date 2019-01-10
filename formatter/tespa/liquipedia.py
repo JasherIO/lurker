@@ -104,9 +104,7 @@ with open('rounds.wiki', 'w') as f:
 
 with open('crosstable.wiki', 'w') as f:
 
-  lines = '====Overview====\n\n'
-  lines += '{{box|start|padding=1em|padding-bottom=20px}}\n\n'
-  lines += '{{DetailedCrossTable\n'
+  lines = '{{DetailedCrossTable\n'
 
   sortedTeams = sorted(list(teams))
   for (index, key) in enumerate(sortedTeams):
@@ -127,6 +125,5 @@ with open('crosstable.wiki', 'w') as f:
     lines += '\n'
 
   lines += '}}\n\n'
-  lines += '{{box|end|padding=1em}}\n'
 
   f.write(lines)
