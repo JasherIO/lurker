@@ -1,4 +1,5 @@
 import csv
+from sets import Set
 
 # Placements
 placements = []
@@ -32,6 +33,8 @@ with open('placements.wiki', 'w') as f:
 
 # Rounds and Cross Table
 rounds = {}
+table = {}
+teams = Set([])
 with open('matches.csv', 'r') as f:
   reader = csv.DictReader(f)
   for row in reader:
@@ -41,7 +44,31 @@ with open('matches.csv', 'r') as f:
       rounds[rnd].append(row)
     else:
       rounds[rnd] = [row]
-      
+
+    # Force teamA to the alphabetical first team
+    if not row['teamA'] < row['teamB']:
+      tmp = row['teamA']
+      row['teamA'] = row['teamB']
+      row['teamB'] = tmp
+
+      tmp = row['scoreA']
+      row['scoreA'] = row['scoreB']
+      row['scoreB'] = tmp
+    
+    key = row['teamA']
+
+    if key in table:
+      table[key].append(row)
+    else:
+      table[key] = [row]
+
+    teams.add(row['teamA'])
+    teams.add(row['teamB'])
+
+# Sort matches by the opponent faced
+for key in table.keys():
+  table[key] = sorted(table[key], key=lambda x: x['teamB'])
+
 keys = map(lambda x: str(x), sorted(map(lambda x: int(x), rounds.keys())))
 
 with open('rounds.wiki', 'w') as f:
@@ -74,3 +101,32 @@ with open('rounds.wiki', 'w') as f:
     lines += '{{box|end}}\n\n' if key == '7' else '{{box|break|padding=2em}}\n\n'
   
     f.write(lines)
+
+with open('crosstable.wiki', 'w') as f:
+
+  lines = '====Overview====\n\n'
+  lines += '{{box|start|padding=1em|padding-bottom=20px}}\n\n'
+  lines += '{{DetailedCrossTable\n'
+
+  sortedTeams = sorted(list(teams))
+  for (index, key) in enumerate(sortedTeams):
+    lines += '|team{}={}\n'.format(index+1, key)
+
+  lines += '\n'
+
+  sortedKeys = sorted(table.keys())
+  for (indexA, key) in enumerate(sortedKeys):
+    matches = table[key]
+    
+    for (indexB, match) in enumerate(matches):
+      lines += '|team{}vsteam{}result={}'.format(indexA+1, indexA+indexB+2, match['scoreA'])
+      lines += '|team{}vsteam{}resultvs={}'.format(indexA+1, indexA+indexB+2, match['scoreB'])
+      lines += '|team{}vsteam{}date=Round {}'.format(indexA+1, indexA+indexB+2, match['rnd'])
+      lines += '|team{}vsteam{}link=#Round {}\n'.format(indexA+1, indexA+indexB+2, match['rnd'])
+
+    lines += '\n'
+
+  lines += '}}\n\n'
+  lines += '{{box|end|padding=1em}}\n'
+
+  f.write(lines)
