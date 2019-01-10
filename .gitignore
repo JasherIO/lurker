@@ -108,3 +108,4 @@ venv.bak/
 *.jl
 *.json
 *.wiki
+data/
