@@ -12,46 +12,45 @@ RANKS_SELECTOR = '#season-9 > table:nth-child(2) > tbody > tr'
 RANK_NAME_SELECTOR = 'td:nth-child(2)::text'
 RANK_MMR_SELECTOR = 'td:nth-child(4)::text'
 
-def toUrl(player):
-    return "https://rocketleague.tracker.network/profile/" + player['platform'] + "/" + player['platformId']
-
-# scrapy crawl rl-tracker-network -a entrantsFile="players.csv"
+# scrapy crawl rl-tracker-network -a playersFile="players.csv"
 class RlTrackerNetworkSpider(scrapy.Spider):
     name = 'rl-tracker-network'
     allowed_domains = ['rocketleague.tracker.network']
 
     def start_requests(self):
 
-        if not hasattr(self, 'entrantsFile'):
+        if not hasattr(self, 'playersFile'):
             return
 
-        if self.entrantsFile.endswith('.csv'):
+        with open(self.playersFile, 'r') as csvfile:
+            for obj in csv.DictReader(csvfile):
 
-            with open(self.entrantsFile, 'r') as csvfile:
-                for obj in csv.DictReader(csvfile):
-                    request = scrapy.Request(toUrl(obj), self.parse)
-                    request.meta['player'] = obj
-                    yield request
+                hasTeam = ('team' in obj) and obj['team']
+                hasPlatform = ('platform' in obj) and obj['platform']
+                hasPlatformId = ('platformId' in obj) and obj['platformId']
+                hasSteam = ('steam' in obj) and obj['steam']
+
+                if hasPlatform and hasPlatformId:
+                    platform = obj['platform']
+                    platformId = obj['platformId']
+
+                elif hasSteam:
+                    platform = 'steam'
+                    platformId = obj['steam']
+
+                elif not (hasTeam and hasPlatform and hasPlatformId):
+                    continue
+
+                url = "https://rocketleague.tracker.network/profile/{}/{}".format(platform, platformId)
+                request = scrapy.Request(url, self.parse)
+                request.meta['player'] = obj['displayName']
+                request.meta['team'] = obj['team']
+                yield request
             
-        if self.entrantsFile.endswith('.json'):
-            with open(self.entrantsFile, 'r') as jsonfile:
-                for obj in json.load(jsonfile):
-                    request = scrapy.Request(toUrl(obj), self.parse)
-                    request.meta['player'] = obj
-                    yield request
-
-        if self.entrantsFile.endswith('.jl'):
-            with open(self.entrantsFile, 'r') as jlfile:
-                for line in jlfile:
-                    obj = json.loads(line)
-                    request = scrapy.Request(toUrl(obj), self.parse)
-                    request.meta['player'] = obj
-                    yield request
-
         return
         
     def parse(self, response):
-        item = Rank(player=response.meta['player']['displayName'], team=response.meta['player']['team'])
+        item = Rank(player=response.meta['player'], team=response.meta['team'])
 
         error = response.css(ERROR_SELECTOR).extract_first()
         if not error:
