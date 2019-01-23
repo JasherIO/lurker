@@ -2,10 +2,15 @@
 
 # Usage: scrapy crawl tespa -a tournament="https://compete.tespa.org/tournament/78/phase/3/group/1"
 
+# S1 Eastern: 'https://compete.tespa.org/tournament/80/phase/3/group/1'
 # S1 Northern: 'https://compete.tespa.org/tournament/78/phase/3/group/1'
 # S1 Southern: 'https://compete.tespa.org/tournament/79/phase/3/group/1'
-# S1 Eastern: 'https://compete.tespa.org/tournament/80/phase/3/group/1'
 # S1 Western: 'https://compete.tespa.org/tournament/81/phase/3/group/1'
+
+# S2 Eastern: 'https://compete.tespa.org/tournament/119/phase/3/group/1'
+# S1 Northern: 'https://compete.tespa.org/tournament/117/phase/3/group/1'
+# S2 Southern: 'https://compete.tespa.org/tournament/118/phase/3/group/1'
+# S2 Western: 'https://compete.tespa.org/tournament/120/phase/3/group/1'
 
 import scrapy
 from ..items import Match, Placement, Player, Team
