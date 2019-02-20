@@ -8,21 +8,22 @@ import json
 import logging
 
 ERROR_SELECTOR = 'body > div.container.content-container > div:nth-child(1) > div.alert.alert-danger.alert-dismissable'
-RANKS_SELECTOR = '#season-9 > table:nth-child(2) > tbody > tr'
+RANKS_SELECTOR = '#season-10 > table:nth-child(2) > tbody > tr'
+# RANKS_SELECTOR = '#season-9 > table > tbody > tr'
 RANK_NAME_SELECTOR = 'td:nth-child(2)::text'
 RANK_MMR_SELECTOR = 'td:nth-child(4)::text'
 
-# scrapy crawl rl-tracker-network -a playersFile="players.csv"
+# scrapy crawl rl-tracker-network -a file="file.csv"
 class RlTrackerNetworkSpider(scrapy.Spider):
     name = 'rl-tracker-network'
     allowed_domains = ['rocketleague.tracker.network']
 
     def start_requests(self):
 
-        if not hasattr(self, 'playersFile'):
+        if not hasattr(self, 'file'):
             return
 
-        with open(self.playersFile, 'r') as csvfile:
+        with open(self.file, 'r') as csvfile:
             for obj in csv.DictReader(csvfile):
 
                 hasTeam = ('team' in obj) and obj['team']
@@ -45,12 +46,13 @@ class RlTrackerNetworkSpider(scrapy.Spider):
                 request = scrapy.Request(url, self.parse)
                 request.meta['player'] = obj['displayName']
                 request.meta['team'] = obj['team']
+                request.meta['isCheckedIn'] = obj['isCheckedIn'] if ('isCheckedIn' in obj) else ''
                 yield request
             
         return
         
     def parse(self, response):
-        item = Rank(player=response.meta['player'], team=response.meta['team'])
+        item = Rank(player=response.meta['player'], team=response.meta['team'], isCheckedIn=response.meta['isCheckedIn'])
 
         error = response.css(ERROR_SELECTOR).extract_first()
         if not error:
