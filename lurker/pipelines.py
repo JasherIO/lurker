@@ -76,7 +76,7 @@ class PlayerPipeline(object):
         if spider.name == 'rl-tracker-network':
             return
         
-        fields_to_export = ['displayName', 'team', 'platform', 'platformId']
+        fields_to_export = ['displayName', 'team', 'platform', 'platformId', 'isCheckedIn']
         f = open('players.csv', 'wb')
         self.exporter = CsvItemExporter(f, fields_to_export=fields_to_export)
         self.exporter.start_exporting()
@@ -115,6 +115,7 @@ class RankPipeline(object):
 
         fieldnames = [
             'team',
+            'isCheckedIn',
             'player1',
             'player2',
             'player3',
@@ -183,6 +184,7 @@ class RankPipeline(object):
 
             self.teams[team] = {
                 'team': team,
+                'isCheckedIn': get(item, 'isCheckedIn'),
                 'player1': get(item, 'player'),
                 'player1Duel': get(item, 'duel'),
                 'player1Doubles': get(item, 'doubles'),

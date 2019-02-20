@@ -31,10 +31,12 @@ class Player(scrapy.Item):
     platformId = scrapy.Field()
     role = scrapy.Field()
     team = scrapy.Field()
+    isCheckedIn = scrapy.Field()
 
 class Rank(scrapy.Item):
     player = scrapy.Field()
     team = scrapy.Field()
+    isCheckedIn = scrapy.Field()
     duel = scrapy.Field()
     doubles = scrapy.Field()
     standard = scrapy.Field()
