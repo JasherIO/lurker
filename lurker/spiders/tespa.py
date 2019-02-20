@@ -45,8 +45,8 @@ class TespaSpider(scrapy.Spider):
     allowed_domains = ['compete.tespa.org']
 
     def start_requests(self):
-        if hasattr(self, 'tournament'):
-            yield scrapy.Request(self.tournament, self.parse)
+        if hasattr(self, 'url'):
+            yield scrapy.Request(self.url, self.parse)
 
     def parse(self, response):
         # Standings
