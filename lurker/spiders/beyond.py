@@ -1,12 +1,18 @@
 # -*- coding: utf-8 -*-
 
-# Usage: scrapy crawl beyond -a tournament="https://teambeyond.net/forum/tournaments/164-astronauts-2000-rocket-league-3v3-1217-700pm-est/standings/"
+# Usage: scrapy crawl beyond -a url="https://teambeyond.net/forum/tournaments/164-astronauts-2000-rocket-league-3v3-1217-700pm-est/standings/"
 
 import scrapy
 import validators
 from ..items import Player
 
+import logging
+
 TEAMS_SELECTOR = '#ipsTabs_elTourneyTabs_standings_panel > div > div > table > tbody > tr > td > a::attr(href)'
+TEAM_ROWS_SELECTOR = '#ipsTabs_elTourneyTabs_standings_panel > div > div > table > tbody > tr'
+TEAM_LINK_SELECTOR = 'td > a::attr(href)'
+TEAM_CHECKED_IN_SELECTOR_1 = 'td:nth-child(6) > div::text'
+TEAM_CHECKED_IN_SELECTOR_2 = 'td:nth-child(7) > div::text'
 TEAM_NAME_SELECTOR = '#ipsLayout_mainArea > section > div:nth-child(1) > div.title-section > h3::text'
 PLAYERS_SELECTOR = '#ipsTabs_elTeamTabs_details_panel > div > div > table > tbody > tr'
 PLAYER_DISPLAY_NAME_SELECTOR = 'td:nth-child(1) > a::text'
@@ -23,17 +29,20 @@ class BeyondSpider(scrapy.Spider):
     allowed_domains = ['teambeyond.net']
 
     def start_requests(self):
-        if hasattr(self, 'tournament'):
-            yield scrapy.Request(self.tournament, self.parse)
-        
-        if hasattr(self, 'team'):
-            yield scrapy.Request(self.team, self.parse_team)
+        if hasattr(self, 'url'):
+            yield scrapy.Request(self.url, self.parse)
 
         return
 
     def parse(self, response):
-        for href in response.css(TEAMS_SELECTOR):
-            yield response.follow(href, self.parse_team)
+        for row in response.css(TEAM_ROWS_SELECTOR):
+            href = row.css(TEAM_LINK_SELECTOR).extract_first(default='')
+            text = row.css(TEAM_CHECKED_IN_SELECTOR_1).extract_first(default='').strip() or row.css(TEAM_CHECKED_IN_SELECTOR_2).extract_first(default='').strip()
+            isCheckedIn = True if text == "Checked In" else False
+
+            request = scrapy.Request(href, self.parse_team)
+            request.meta['isCheckedIn'] = isCheckedIn
+            yield request
 
     def parse_team(self, response):
         team = response.css(TEAM_NAME_SELECTOR).extract_first(default='')
@@ -52,4 +61,4 @@ class BeyondSpider(scrapy.Spider):
             if validators.url(platformId) or platformId.find('steamcommunity') > -1:
                 platformId = platformId.strip('/').split('/').pop()
 
-            yield Player(team=team, displayName=displayName, platform=platform, platformId=platformId)
+            yield Player(team=team, displayName=displayName, platform=platform, platformId=platformId, isCheckedIn=response.meta['isCheckedIn'])
